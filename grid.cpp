@@ -622,6 +622,52 @@ void Grid::merge(Grid other, unsigned int x0, unsigned int y0, bool alive_only){
  * @return
  *      Returns a copy of the grid that has been rotated.
  */
+Grid Grid::rotate(int rotation){
+    // 1, -3 = 90
+    // 2, -2 = 180
+    // -1, 3 = 270
+    rotation = std::abs(rotation % 4 + 4) % 4;
+    if(rotation == 1){
+        Grid *g = new Grid(height,width);
+        if(width >= height) {
+            for (int y = 0; y < width; y++) {
+                for (int x = 0; x < height; x++) {
+                    int offset = (height * height - 1) - (x * (width)) + y;
+                    g->set(x, y, grid[offset]);
+                }
+            }
+        } else{
+            for (int y = 0; y < width; y++) {
+                for (int x = 0; x < height; x++) {
+                    int offset = (width * width) - (x * (width)) + y;
+                    g->set(x, y, grid[offset]);
+                }
+            }
+        }
+        return *g;
+
+    } else if(rotation == 2){
+        Grid *g = new Grid(width,height);
+        for(int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int offset = (height*width-1) - get_index(x,y);
+                g->set(x, y, grid[offset]);
+            }
+        }
+        return *g;
+
+    } else if(rotation == 3){
+        Grid *g = new Grid(height,width);
+        for(int y = 0; y < width; y++) {
+            for (int x = 0; x < height; x++) {
+                int offset = (width-1-y) + (x*(width));
+                g->set(x, y, grid[offset]);
+            }
+        }
+        return *g;
+    }
+    return *this;
+}
 
 
 /**
