@@ -57,4 +57,6 @@ public:
     const Cell& operator()(const unsigned int width, const unsigned int height) const;
 
     Grid crop(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1);
+    void merge(Grid other, unsigned int x0, unsigned int y0, bool alive_only = false);
+
 };
