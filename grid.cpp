@@ -706,3 +706,29 @@ Grid Grid::rotate(int rotation){
  *      Returns a reference to the output stream to enable operator chaining.
  */
 
+std::ostream& operator << (std::ostream& out, const Grid& g){
+    out << "+";
+    for(int i = 0; i < g.get_width(); i++){
+        out << "-";
+    }
+    out << "+" << std::endl;
+
+    for(int j = 0; j < g.get_height();j++){
+        out << "|";
+        for(int i = 0; i < g.get_width(); i++){
+            if(g.get(i,j) == Cell::ALIVE){
+                out << "#";
+            } else {
+                out << " ";
+            }
+        }
+        out << "|" << std::endl;
+    }
+
+    out << "+";
+    for(int i = 0; i < g.get_width(); i++){
+        out << "-";
+    }
+    out << "+" << std::endl;
+    return out;
+}
