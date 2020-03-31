@@ -367,6 +367,11 @@ void Grid::resize(const unsigned int &w, const unsigned int &h) {
  */
 
 
+int Grid::get_index(unsigned int x, unsigned int y) const{
+    int index = (width * y) + x;
+    return index;
+}
+
 /**
  * Grid::get(x, y)
  *
@@ -396,12 +401,19 @@ void Grid::resize(const unsigned int &w, const unsigned int &h) {
  *      std::exception or sub-class if x,y is not a valid coordinate within the grid.
  */
 
+Cell Grid::get(unsigned int x,unsigned int y) const{
+    if(!grid[get_index(x,y)]){
+        throw(std::exception());
+    }else{
+        Cell cell = grid[get_index(x,y)];
+        return cell;
+    }
+}
 
 /**
  * Grid::set(x, y, value)
  *
  * Overwrites the value at the desired coordinate.
- * The function should be callable from a constant context.
  * Should be implemented by invoking Grid::operator()(x, y).
  *
  * @example
@@ -424,6 +436,13 @@ void Grid::resize(const unsigned int &w, const unsigned int &h) {
  * @throws
  *      std::exception or sub-class if x,y is not a valid coordinate within the grid.
  */
+void Grid::set(const unsigned int &x, const unsigned int &y, const Cell &value){
+    if(!grid[get_index(x,y)]){
+        throw(std::exception());
+    }else{
+        grid[get_index(x,y)] = value;
+    }
+}
 
 
 /**

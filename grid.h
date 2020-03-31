@@ -49,4 +49,8 @@ public:
     void resize(const unsigned int &square_size);
     void resize(const unsigned int &width, const unsigned int &height);
 
+    int get_index(unsigned int width, unsigned int height) const;
+    Cell get(unsigned int x, unsigned int y) const;
+    void set(const unsigned int &x, const unsigned int &y, const Cell &value);
+
 };
