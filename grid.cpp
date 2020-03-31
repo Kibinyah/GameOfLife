@@ -271,6 +271,31 @@ int Grid::get_dead_cells() const{
  *      The new edge size for both the width and height of the grid.
  */
 
+void Grid::resize(const unsigned int &square_size){
+
+    Cell *oldGrid = new Cell[width * height];
+    oldGrid = grid;
+    grid = new Cell[square_size*square_size];
+
+    for(int y = 0; y < square_size; y++){
+        for(int x = 0; x < square_size; x++){
+            int coordinate = (square_size * y) + x;
+
+            if(oldGrid[(width * y) + x]){
+                grid[coordinate] = oldGrid[(width * y) + x];
+            }else{
+                grid[coordinate] = Cell::DEAD;
+            }
+        }
+    }
+    delete [] oldGrid;
+    oldGrid = nullptr;
+
+
+
+    width = square_size;
+    height = square_size;
+}
 
 /**
  * Grid::resize(width, height)
@@ -292,7 +317,37 @@ int Grid::get_dead_cells() const{
  * @param new_height
  *      The new height for the grid.
  */
+void Grid::resize(const unsigned int &w, const unsigned int &h) {
+    int newWidth = std::min(w, width);
+    int newHeight = std::min(h, height);
 
+    Cell *oldGrid = new Cell[width * height];
+    oldGrid = grid;
+
+    grid = new Cell[w * h];
+
+    for (int y = 0; y < newHeight; y++) {
+        for (int x = 0; x < newWidth; x++) {
+            if (oldGrid[(width * y) + x]) {
+                grid[(w * y) + x] = oldGrid[(width * y) + x];
+            } else {
+                grid[(w * y) + x] = Cell::DEAD;
+            }
+        }
+    }
+
+    for (int i = 0; i < w * h; i++) {
+        if (grid[i] != Cell::ALIVE) {
+            grid[i] = Cell::DEAD;
+        }
+    }
+
+    oldGrid = nullptr;
+    delete[] oldGrid;
+
+    width = w;
+    height = h;
+}
 
 /**
  * Grid::get_index(x, y)

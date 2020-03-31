@@ -13,6 +13,9 @@
 // Add the minimal number of includes you need in order to declare the class.
 // #include ...
 
+#include <string>
+#include <iostream>
+
 /**
  * A Cell is a char limited to two named values for Cell::DEAD and Cell::ALIVE.
  */
@@ -42,4 +45,8 @@ public:
     int get_total_cells() const;
     int get_alive_cells() const;
     int get_dead_cells() const;
+
+    void resize(const unsigned int &square_size);
+    void resize(const unsigned int &width, const unsigned int &height);
+
 };
