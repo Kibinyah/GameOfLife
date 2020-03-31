@@ -380,12 +380,12 @@ int World::count_neighbours(const int x, const int y, bool toroidal){
                     continue;
                 }
                     //Left side of the grid and corners
-                else if (i - 1 < 0) {
-                    if (j - 1 < 0) {
+                else if (i  < 0) {
+                    if (j < 0) {
                         if (get_state().get(get_width() - 1, get_height() - 1) == Cell::ALIVE) {
                             count_neighbours += 1;
                         }
-                    } else if (j + 1 >= get_height()) {
+                    } else if (j >= get_height()) {
                         if (get_state().get(get_width() - 1, 0) == Cell::ALIVE) {
                             count_neighbours += 1;
                         }
@@ -395,12 +395,12 @@ int World::count_neighbours(const int x, const int y, bool toroidal){
                         }
                     }
                     //right side of grid and corners
-                } else if (i + 1 >= get_width()) {
-                    if (j - 1 < 0) {
+                } else if (i >= get_width()) {
+                    if (j < 0) {
                         if (get_state().get(0, get_height() - 1) == Cell::ALIVE) {
                             count_neighbours += 1;
                         }
-                    } else if (j + 1 >= get_height()) {
+                    } else if (j >= get_height()) {
                         if (get_state().get(0, 0) == Cell::ALIVE) {
                             count_neighbours += 1;
                         }
@@ -410,12 +410,12 @@ int World::count_neighbours(const int x, const int y, bool toroidal){
                         }
                     }
                     //top side of grid
-                }else if (j - 1 < 0) {
+                }else if (j < 0) {
                     if (get_state().get(i, get_height() - 1) == Cell::ALIVE) {
                         count_neighbours += 1;
                     }
                     //bottom side of grid
-                }else if (j + 1 >= get_height()) {
+                }else if (j >= get_height()) {
                     if (get_state().get(i, 0) == Cell::ALIVE) {
                         count_neighbours += 1;
                     }
