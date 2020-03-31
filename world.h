@@ -41,4 +41,9 @@ class World {
         int get_total_cells() const;
         int get_alive_cells() const;
         int get_dead_cells() const;
+
+        Grid get_state() const;
+        void resize(const unsigned int &square_size);
+        void resize(const unsigned int &width, const unsigned int &height);
+
 };
