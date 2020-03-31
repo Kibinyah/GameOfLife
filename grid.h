@@ -28,5 +28,18 @@ class Grid {
     // How to draw an owl:
     //      Step 1. Draw a circle.
     //      Step 2. Draw the rest of the owl.
+private:
+    unsigned int width;
+    unsigned int height;
+    Cell *grid;
+public:
+    Grid();
+    Grid(unsigned int square_size);
+    Grid(unsigned int width, unsigned int height);
 
+    int get_width() const;
+    int get_height() const;
+    int get_total_cells() const;
+    int get_alive_cells() const;
+    int get_dead_cells() const;
 };
