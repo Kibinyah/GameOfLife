@@ -18,7 +18,7 @@
  *          - Moving off the left edge you appear on the right edge and vice versa.
  *          - Moving off the top edge you appear on the bottom edge and vice versa.
  *
- * @author YOUR_STUDENT_NUMBER
+ * @author 969449
  * @date March, 2020
  */
 #include "world.h"
@@ -37,7 +37,10 @@
  *      World world;
  *
  */
-
+World::World(){
+    currentGrid = NULL;
+    nextGrid = NULL;
+}
 
 /**
  * World::World(square_size)
@@ -59,6 +62,9 @@
  *      The edge size to use for the width and height of the world.
  */
 
+World::World(unsigned int squaresize){
+    currentGrid = Grid(squaresize);
+}
 
 /**
  * World::World(width, height)
@@ -76,6 +82,9 @@
  *      The height of the world.
  */
 
+World::World(unsigned int width, unsigned int height){
+    currentGrid = Grid(width,height);
+}
 
 /**
  * World::World(initial_state)
@@ -97,6 +106,9 @@
  *      The state of the constructed world.
  */
 
+World::World(Grid initial_grid){
+    currentGrid = initial_grid;
+}
 
 /**
  * World::get_width()
@@ -122,6 +134,9 @@
  *      The width of the world.
  */
 
+int World::get_width() const {
+    return currentGrid.get_width();
+}
 
 /**
  * World::get_height()
@@ -146,7 +161,9 @@
  * @return
  *      The height of the world.
  */
-
+int World::get_height() const {
+    return currentGrid.get_height();
+}
 
 /**
  * World::get_total_cells()
@@ -171,7 +188,9 @@
  * @return
  *      The number of total cells.
  */
-
+int World::get_total_cells() const {
+    return currentGrid.get_total_cells();
+}
 
 /**
  * World::get_alive_cells()
@@ -196,7 +215,9 @@
  * @return
  *      The number of alive cells.
  */
-
+int World::get_alive_cells() const {
+    return currentGrid.get_alive_cells();
+}
 
 /**
  * World::get_dead_cells()
@@ -221,7 +242,9 @@
  * @return
  *      The number of dead cells.
  */
-
+int World::get_dead_cells() const {
+    return currentGrid.get_dead_cells();
+}
 
 /**
  * World::get_state()
