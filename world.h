@@ -29,6 +29,7 @@ class World {
     private:
         Grid currentGrid;
         Grid nextGrid;
+    int count_neighbours(const  int x, const  int y, const bool torodial);
     public:
         World();
         World(unsigned int squaresize);
@@ -46,4 +47,6 @@ class World {
         void resize(const unsigned int &square_size);
         void resize(const unsigned int &width, const unsigned int &height);
 
+        void step(bool toroidal = false);
+        void advance(const unsigned int steps, bool toroidal = false);
 };

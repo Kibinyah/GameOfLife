@@ -444,6 +444,41 @@ void Grid::set(const unsigned int &x, const unsigned int &y, const Cell &value){
     }
 }
 
+/**
+ * Grid::operator()(x, y)
+ *
+ * Gets a modifiable reference to the value at the desired coordinate.
+ * Should be implemented by invoking Grid::get_index(x, y).
+ *
+ * @example
+ *
+ *      // Make a grid
+ *      Grid grid(4, 4);
+ *
+ *      // Get access to read a cell at coordinate (1, 2)
+ *      Cell cell = grid(1, 2);
+ *
+ *      // Directly assign to a cell at coordinate (1, 2)
+ *      grid(1, 2) = Cell::ALIVE;
+ *
+ *      // Extract a reference to an individual cell to avoid calculating it's
+ *      // 1d index multiple times if you need to access the cell more than once.
+ *      Cell &cell_reference = grid(1, 2);
+ *      cell_reference = Cell::DEAD;
+ *      cell_reference = Cell::ALIVE;
+ *
+ * @param x
+ *      The x coordinate of the cell to access.
+ *
+ * @param y
+ *      The y coordinate of the cell to access.
+ *
+ * @return
+ *      A modifiable reference to the desired cell.
+ *
+ * @throws
+ *      std::runtime_error or sub-class if x,y is not a valid coordinate within the grid.
+ */
 
 
 Cell& Grid::operator()(const unsigned int x, const unsigned int y){
