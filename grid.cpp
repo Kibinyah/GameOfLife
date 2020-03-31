@@ -445,43 +445,10 @@ void Grid::set(const unsigned int &x, const unsigned int &y, const Cell &value){
 }
 
 
-/**
- * Grid::operator()(x, y)
- *
- * Gets a modifiable reference to the value at the desired coordinate.
- * Should be implemented by invoking Grid::get_index(x, y).
- *
- * @example
- *
- *      // Make a grid
- *      Grid grid(4, 4);
- *
- *      // Get access to read a cell at coordinate (1, 2)
- *      Cell cell = grid(1, 2);
- *
- *      // Directly assign to a cell at coordinate (1, 2)
- *      grid(1, 2) = Cell::ALIVE;
- *
- *      // Extract a reference to an individual cell to avoid calculating it's
- *      // 1d index multiple times if you need to access the cell more than once.
- *      Cell &cell_reference = grid(1, 2);
- *      cell_reference = Cell::DEAD;
- *      cell_reference = Cell::ALIVE;
- *
- * @param x
- *      The x coordinate of the cell to access.
- *
- * @param y
- *      The y coordinate of the cell to access.
- *
- * @return
- *      A modifiable reference to the desired cell.
- *
- * @throws
- *      std::runtime_error or sub-class if x,y is not a valid coordinate within the grid.
- */
 
-
+Cell& Grid::operator()(const unsigned int x, const unsigned int y){
+    return grid[get_index(x,y)];
+}
 /**
  * Grid::operator()(x, y)
  *
@@ -513,6 +480,9 @@ void Grid::set(const unsigned int &x, const unsigned int &y, const Cell &value){
  *      std::exception or sub-class if x,y is not a valid coordinate within the grid.
  */
 
+const Cell& Grid::operator()(const unsigned int x, const unsigned int y) const{
+    return grid[get_index(x,y)];
+}
 
 /**
  * Grid::crop(x0, y0, x1, y1)
@@ -548,6 +518,26 @@ void Grid::set(const unsigned int &x, const unsigned int &y, const Cell &value){
  *      std::exception or sub-class if x0,y0 or x1,y1 are not valid coordinates within the grid
  *      or if the crop window has a negative size.
  */
+Grid Grid::crop(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1) {
+    int firstIndex = get_index(x0, y0);
+    int secondIndex = get_index(x1, y1);
+    int newWidth = x1 - x0;
+    int newHeight = y1 - y0;
+    Grid g = Grid(newWidth, newHeight);
+
+    g.grid[get_index(newWidth, newHeight)] = grid[secondIndex];
+
+    for (int x = 0; x < newWidth; x++) {
+        g.grid[x] = grid[firstIndex + x];
+        for (int y = 1; y <= newHeight; y++) {
+            g.grid[x + (newWidth * y)] = grid[(firstIndex + x) + (width * y)];
+        }
+    }
+    delete grid;
+    grid = nullptr;
+    return g;
+}
+
 
 
 /**
