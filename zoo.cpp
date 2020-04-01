@@ -157,8 +157,7 @@ Grid Zoo::load_ascii(std::string path){
 
     if (!file.is_open()) {
         throw std::runtime_error("No file found");
-    } else {
-        //getline(file,line);
+    }
         file >> width >> height;
 
         if (width < 0 || height < 0) {
@@ -166,26 +165,26 @@ Grid Zoo::load_ascii(std::string path){
         }
         g = Grid(width, height);
         while (getline(file, line) && y < height) {
-            if(line.size() != width && y > 0){
+            if (line.size() != width && y > 0) {
                 throw std::runtime_error("No characters in new line");
             }
             for (int x = 0; x < line.size(); x++) {
                 char c = line.at(x);
                 if (c == '#') {
                     g.set(x, y, Cell::ALIVE);
-                } else if(c == ' '){
+                } else if (c == ' ') {
                     g.set(x, y, Cell::DEAD);
-                } else{
+                } else {
                     throw std::runtime_error("Wrong character");
                 }
             }
             // }
-            if(line.size() == width){
+            if (line.size() == width) {
                 y++;
             }
         }
         return g;
-    }
+
 }
 
 /**
@@ -216,7 +215,30 @@ Grid Zoo::load_ascii(std::string path){
  * @throws
  *      Throws std::runtime_error or sub-class if the file cannot be opened.
  */
-
+void Zoo::save_ascii(std::string path, const Grid& g){
+    std::ofstream file;
+    file.open(path,std::ios::out);
+    if(!file.is_open()){
+        throw std::runtime_error("Unable to open file");
+    }
+    file << g.get_width() << " " << g.get_height() << "\n";
+    std::stringstream ss;
+    ss << g;
+    std::string s = ss.str();
+    bool temp = true;
+    for(int i = 0; i < s.size() - g.get_width() - 3; i++) {
+        if (s.at(i) == ' ') {
+            file << ' ';
+        } else if (s.at(i) == '#') {
+            file << '#';
+        } else if (s.at(i) == '\n' && temp == false) {
+            file << '\n';
+        } else if (s.at(i) == '\n' && temp == true) {
+            temp = false;
+        }
+    }
+    file.close();
+}
 
 /**
  * Zoo::load_binary(path)
