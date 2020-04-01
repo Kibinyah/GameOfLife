@@ -18,11 +18,12 @@
  *                padded with zero or more 0 bits.
  *              - a 0 bit should be considered Cell::DEAD, a 1 bit should be considered Cell::ALIVE.
  *
- * @author YOUR_STUDENT_NUMBER
+ * @author 969449
  * @date March, 2020
  */
 #include "zoo.h"
-
+#include <fstream>
+#include <sstream>
 // Include the minimal number of headers needed to support your implementation.
 // #include ...
 
@@ -46,7 +47,15 @@
  * @return
  *      Returns a Grid containing a glider.
  */
-
+Grid Zoo::glider(){
+    Grid g(3,3);
+    g.set(1,0,Cell::ALIVE);
+    g.set(2,1,Cell::ALIVE);
+    g.set(2,0,Cell::ALIVE);
+    g.set(2,1,Cell::ALIVE);
+    g.set(2,2,Cell::ALIVE);
+    return g;
+}
 
 /**
  * Zoo::r_pentomino()
@@ -68,12 +77,20 @@
  * @return
  *      Returns a Grid containing a r-pentomino.
  */
-
+ Grid Zoo::r_pentomino(){
+     Grid g(3,3);
+     g.set(1,0,Cell::ALIVE);
+     g.set(2,0,Cell::ALIVE);
+     g.set(0,1,Cell::ALIVE);
+     g.set(1,1,Cell::ALIVE);
+     g.set(1,2,Cell::ALIVE);
+     return g;
+ }
 
 /**
  * Zoo::light_weight_spaceship()
  *
- * Construct a 3x3 grid containing a light weight spaceship.
+ * Construct a 5x4 grid containing a light weight spaceship.
  * https://www.conwaylife.com/wiki/Lightweight_spaceship
  *
  * @example
@@ -91,7 +108,19 @@
  * @return
  *      Returns a grid containing a light weight spaceship.
  */
-
+Grid Zoo::light_weight_spaceship(){
+    Grid g(5,4);
+    g.set(1,0,Cell::ALIVE);
+    g.set(4,0,Cell::ALIVE);
+    g.set(0,1,Cell::ALIVE);
+    g.set(0,2,Cell::ALIVE);
+    g.set(0,3,Cell::ALIVE);
+    g.set(4,3,Cell::ALIVE);
+    g.set(1,3,Cell::ALIVE);
+    g.set(2,3,Cell::ALIVE);
+    g.set(3,3,Cell::ALIVE);
+    return g;
+}
 
 /**
  * Zoo::load_ascii(path)
@@ -117,7 +146,47 @@
  *          - Newline characters are not found when expected during parsing.
  *          - The character for a cell is not the ALIVE or DEAD character.
  */
+Grid Zoo::load_ascii(std::string path){
+    std::string line;
+    std::ifstream file(path);
+    int width = 0;
+    int height = 0;
+    //int x = 0;
+    int y = 0;
+    Grid g;
 
+    if (!file.is_open()) {
+        throw std::runtime_error("No file found");
+    } else {
+        //getline(file,line);
+        file >> width >> height;
+
+        if (width < 0 || height < 0) {
+            throw (std::runtime_error("Width and height need to be positive"));
+        }
+        g = Grid(width, height);
+        while (getline(file, line) && y < height) {
+            if(line.size() != width && y > 0){
+                throw std::runtime_error("No characters in new line");
+            }
+            for (int x = 0; x < line.size(); x++) {
+                char c = line.at(x);
+                if (c == '#') {
+                    g.set(x, y, Cell::ALIVE);
+                } else if(c == ' '){
+                    g.set(x, y, Cell::DEAD);
+                } else{
+                    throw std::runtime_error("Wrong character");
+                }
+            }
+            // }
+            if(line.size() == width){
+                y++;
+            }
+        }
+        return g;
+    }
+}
 
 /**
  * Zoo::save_ascii(path, grid)
