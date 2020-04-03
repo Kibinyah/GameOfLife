@@ -24,6 +24,7 @@
 #include "zoo.h"
 #include <fstream>
 #include <sstream>
+#include <array>
 // Include the minimal number of headers needed to support your implementation.
 // #include ...
 
@@ -262,6 +263,121 @@ void Zoo::save_ascii(std::string path, const Grid& g){
  *          - The file cannot be opened.
  *          - The file ends unexpectedly.
  */
+Grid Zoo::load_binary(std::string path) {
+    std::ifstream file(path, std::ios::binary);
+    unsigned int width = 0;
+    unsigned int height = 0;
+    //Grid g(width,height);
+    if (!file.is_open()) {
+        throw std::runtime_error("No file found");
+    }
+
+        file.seekg(0, std::ios::end);
+        unsigned int size = file.tellg();
+        file.seekg(0, std::ios::beg);
+
+        file.read((char *) &width, sizeof(int));
+        //file.seekg(4);
+        file.read((char *) &height, sizeof(int));
+        Grid g(width, height);
+
+        //file.seekg(8);
+
+        std::bitset<1000> bitset(width * height);
+        for (int i = 0; i < width * height; i++) {
+            bitset[i] = 0;
+        }
+
+        //int counter = 8;
+        unsigned int temp = 0;
+        for (int j = 8; j < size; j++) {
+            //file.seekg(j);
+            unsigned int byte;
+            file.read((char *) &byte, 1);
+            for (int i = 0; i < 8; i++) {
+                unsigned int bit = (byte >> i) & 0x1;
+                unsigned int index = i + temp;
+                if (bit == 1) {
+                    bitset[index] = 1;
+                }
+            }
+            temp += 8;
+        }
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                unsigned int point = (width * y) + x;
+                if (bitset[point] == 1) {
+                    g.set(x, y, Cell::ALIVE);
+                }
+            }
+        }
+
+    return g;
+}
+    /*std::ifstream file(path, std::ios::in | std::ios::binary);
+    int width;
+    int height;
+
+    if (!file.is_open()) {
+        throw std::runtime_error("No file found");
+    }
+
+    file.seekg(0, std::ios::end);
+    int size = (int) file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    file.read((char *) &width, 4);
+    file.seekg(4);
+    file.read((char *) &height, 4);
+
+    Grid g(width, height);
+
+    file.seekg(8);
+    int counter = 8;
+
+    std::stringstream ss;
+    while (counter != size) {
+        int byte;
+        file.read((char *) &byte, 1);
+        std::array<int,8> bits;
+        for (int i = 0; i < 8; i++) {
+            bits[i] = (byte >> i) & 0x1;
+            ss << bits[i];
+            std::cout << bits[i];
+        }
+        std::cout << std::endl;
+        counter += 1;
+        file.seekg(counter);
+    }
+    std::string s = ss.str();
+    std::cout << s << std::endl;
+    if(s.length() < width*height){
+        throw std::runtime_error("File ended.");
+    }
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            if (s.at((width*y)+x) == '0') {
+                g.set(x, y, Cell::DEAD);
+            } else if(s.at((width*y)+x) == '1') {
+                g.set(x, y, Cell::ALIVE);
+            } else{
+                throw std::runtime_error("Error");
+            }
+        }
+    }
+
+    std::cout << g.get_alive_cells() <<std::endl;
+
+    std::cout << g.get(1,3) <<std::endl;
+    std::cout << g.get(2,3) <<std::endl;
+    std::cout << g.get(3,3) <<std::endl;
+    std::cout << g.get(3,2) <<std::endl;
+    std::cout << g.get(3,2) <<std::endl;
+
+    std::cout << g;
+    return g;
+    */
 
 
 /**

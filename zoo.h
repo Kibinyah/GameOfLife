@@ -28,4 +28,5 @@ namespace Zoo {
         Grid light_weight_spaceship();
         Grid load_ascii(std::string path);
         void save_ascii(std::string, const Grid& g);
+        Grid load_binary(std::string path);
 };

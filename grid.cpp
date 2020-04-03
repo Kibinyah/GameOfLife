@@ -36,7 +36,9 @@
 Grid::Grid(){
     height = 0;
     width = 0;
-    //cellVector->empty();
+
+   // delete [] grid;
+   // grid = nullptr;
     grid = NULL;
 }
 
@@ -63,9 +65,10 @@ Grid::Grid(){
  * @param square_size
  *      The edge size to use for the width and height of the grid.
  */
-Grid::Grid(unsigned int square_size){
+Grid::Grid(const unsigned int& square_size){
     width = square_size;
     height = square_size;
+    //delete [] grid;
     grid = new Cell[square_size*square_size];
     for(int i = 0; i < square_size*square_size; i++){
         //grid->push_back(Cell::DEAD);
@@ -91,7 +94,7 @@ Grid::Grid(unsigned int square_size){
  *      The height of the grid.
  */
 
-Grid::Grid(unsigned int w, unsigned int h){
+Grid::Grid(const unsigned int& w, const unsigned int& h){
     width = w;
     height = h;
     grid = new Cell[w*h];
@@ -99,8 +102,13 @@ Grid::Grid(unsigned int w, unsigned int h){
         //grid->push_back(Cell::DEAD);
         grid[i] = Cell::DEAD;
     }
+    //delete grid;
 };
 
+/*Grid::~Grid(){
+    delete [] grid;
+    grid = nullptr;
+}*/
 /**
  * Grid::get_width()
  *
@@ -126,7 +134,6 @@ Grid::Grid(unsigned int w, unsigned int h){
  */
 
 int Grid::get_width() const{
-
     return width;
 }
 

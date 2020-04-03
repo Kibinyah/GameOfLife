@@ -38,8 +38,9 @@ private:
     int get_index(unsigned int width, unsigned int height) const;
 public:
     Grid();
-    Grid(unsigned int square_size);
-    Grid(unsigned int width, unsigned int height);
+    Grid(const unsigned int &square_size);
+    Grid(const unsigned int &width, const unsigned int &height);
+    //~Grid();
 
     int get_width() const;
     int get_height() const;
