@@ -52,8 +52,8 @@ Grid Zoo::glider(){
     Grid g(3,3);
     g.set(1,0,Cell::ALIVE);
     g.set(2,1,Cell::ALIVE);
-    g.set(2,0,Cell::ALIVE);
-    g.set(2,1,Cell::ALIVE);
+    g.set(0,2,Cell::ALIVE);
+    g.set(1,2,Cell::ALIVE);
     g.set(2,2,Cell::ALIVE);
     return g;
 }
@@ -115,8 +115,8 @@ Grid Zoo::light_weight_spaceship(){
     g.set(4,0,Cell::ALIVE);
     g.set(0,1,Cell::ALIVE);
     g.set(0,2,Cell::ALIVE);
+    g.set(4,2,Cell::ALIVE);
     g.set(0,3,Cell::ALIVE);
-    g.set(4,3,Cell::ALIVE);
     g.set(1,3,Cell::ALIVE);
     g.set(2,3,Cell::ALIVE);
     g.set(3,3,Cell::ALIVE);
@@ -287,10 +287,7 @@ Grid Zoo::load_binary(std::string path) {
             bitset[i] = 0;
         }
 
-        unsigned int temp = 0;
-        if (size > bitset.size()) {
-            throw std::runtime_error("file too large");
-        }
+        int temp = 0;
         for (int j = 8; j < size; j++) {
             unsigned int byte;
             file.read((char *) &byte, 1);
@@ -304,6 +301,10 @@ Grid Zoo::load_binary(std::string path) {
             temp += 8;
         }
 
+        if(temp < width*height){
+            file.close();
+            throw std::runtime_error("File ended unexpectedly");
+        }
         Grid g(width, height);
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -313,7 +314,7 @@ Grid Zoo::load_binary(std::string path) {
                 }
             }
         }
-
+    file.close();
     return g;
 }
 
