@@ -25,6 +25,9 @@
 #include <fstream>
 #include <sstream>
 #include <array>
+#import <stdexcept>
+#include <bitset>
+
 // Include the minimal number of headers needed to support your implementation.
 // #include ...
 
@@ -50,11 +53,11 @@
  */
 Grid Zoo::glider(){
     Grid g(3,3);
-    g.set(1,0,Cell::ALIVE);
-    g.set(2,1,Cell::ALIVE);
-    g.set(0,2,Cell::ALIVE);
-    g.set(1,2,Cell::ALIVE);
-    g.set(2,2,Cell::ALIVE);
+    g.set(1,0,ALIVE);
+    g.set(2,1,ALIVE);
+    g.set(0,2,ALIVE);
+    g.set(1,2,ALIVE);
+    g.set(2,2,ALIVE);
     return g;
 }
 
@@ -80,11 +83,11 @@ Grid Zoo::glider(){
  */
  Grid Zoo::r_pentomino(){
      Grid g(3,3);
-     g.set(1,0,Cell::ALIVE);
-     g.set(2,0,Cell::ALIVE);
-     g.set(0,1,Cell::ALIVE);
-     g.set(1,1,Cell::ALIVE);
-     g.set(1,2,Cell::ALIVE);
+     g.set(1,0,ALIVE);
+     g.set(2,0,ALIVE);
+     g.set(0,1,ALIVE);
+     g.set(1,1,ALIVE);
+     g.set(1,2,ALIVE);
      return g;
  }
 
@@ -111,15 +114,15 @@ Grid Zoo::glider(){
  */
 Grid Zoo::light_weight_spaceship(){
     Grid g(5,4);
-    g.set(1,0,Cell::ALIVE);
-    g.set(4,0,Cell::ALIVE);
-    g.set(0,1,Cell::ALIVE);
-    g.set(0,2,Cell::ALIVE);
-    g.set(4,2,Cell::ALIVE);
-    g.set(0,3,Cell::ALIVE);
-    g.set(1,3,Cell::ALIVE);
-    g.set(2,3,Cell::ALIVE);
-    g.set(3,3,Cell::ALIVE);
+    g.set(1,0,ALIVE);
+    g.set(4,0,ALIVE);
+    g.set(0,1,ALIVE);
+    g.set(0,2,ALIVE);
+    g.set(4,2,ALIVE);
+    g.set(0,3,ALIVE);
+    g.set(1,3,ALIVE);
+    g.set(2,3,ALIVE);
+    g.set(3,3,ALIVE);
     return g;
 }
 
@@ -147,7 +150,7 @@ Grid Zoo::light_weight_spaceship(){
  *          - Newline characters are not found when expected during parsing.
  *          - The character for a cell is not the ALIVE or DEAD character.
  */
-Grid Zoo::load_ascii(std::string path){
+Grid Zoo::load_ascii(const std::string& path){
     std::string line;
     std::ifstream file(path);
     int width = 0;
@@ -184,8 +187,8 @@ Grid Zoo::load_ascii(std::string path){
                 y++;
             }
         }
+        file.close();
         return g;
-
 }
 
 /**
@@ -216,7 +219,7 @@ Grid Zoo::load_ascii(std::string path){
  * @throws
  *      Throws std::runtime_error or sub-class if the file cannot be opened.
  */
-void Zoo::save_ascii(std::string path, const Grid& g){
+void Zoo::save_ascii(const std::string& path, const Grid& g){
     std::ofstream file;
     file.open(path,std::ios::out);
     if(!file.is_open()){
@@ -232,9 +235,9 @@ void Zoo::save_ascii(std::string path, const Grid& g){
             file << ' ';
         } else if (s.at(i) == '#') {
             file << '#';
-        } else if (s.at(i) == '\n' && temp == false) {
+        } else if (s.at(i) == '\n' && !temp) {
             file << '\n';
-        } else if (s.at(i) == '\n' && temp == true) {
+        } else if (s.at(i) == '\n' && temp) {
             temp = false;
         }
     }
@@ -263,7 +266,7 @@ void Zoo::save_ascii(std::string path, const Grid& g){
  *          - The file cannot be opened.
  *          - The file ends unexpectedly.
  */
-Grid Zoo::load_binary(std::string path) {
+Grid Zoo::load_binary(const std::string& path) {
     std::ifstream file(path, std::ios::binary);
     unsigned int width = 0;
     unsigned int height = 0;
@@ -291,7 +294,7 @@ Grid Zoo::load_binary(std::string path) {
         for (int j = 8; j < size; j++) {
             unsigned int byte;
             file.read((char *) &byte, 1);
-            for (int i = 0; i < 8; i++) {
+            for (unsigned int i = 0; i < 8; i++) {
                 unsigned int bit = (byte >> i) & 0x1;
                 unsigned int index = i + temp;
                 if (bit == 1) {
@@ -349,7 +352,7 @@ Grid Zoo::load_binary(std::string path) {
  *      Throws std::runtime_error or sub-class if the file cannot be opened.
  */
 
-void Zoo::save_binary(std::string path, const Grid& g){
+void Zoo::save_binary(const std::string& path, const Grid& g){
     std::ofstream file;
     file.open(path, std::ios::out | std::ios::binary);
     if (!file.is_open()) {

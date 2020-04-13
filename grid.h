@@ -40,23 +40,23 @@ public:
     Grid(unsigned int square_size);
     Grid(unsigned int width, unsigned int height);
     //~Grid();
-    int get_width() const;
-    int get_height() const;
-    int get_total_cells() const;
-    int get_alive_cells() const;
-    int get_dead_cells() const;
+    unsigned int get_width() const;
+    unsigned int get_height() const;
+    unsigned int get_total_cells() const;
+    unsigned int get_alive_cells() const;
+    unsigned int get_dead_cells() const;
 
     void resize(const unsigned int &square_size);
     void resize(const unsigned int &width, const unsigned int &height);
 
-    int get_index(unsigned int width, unsigned int height) const;
+    unsigned int get_index(unsigned int width, unsigned int height) const;
     Cell get(unsigned int x, unsigned int y) const;
     void set(const unsigned int &x, const unsigned int &y, const Cell &value);
 
-    Cell& operator()(const unsigned int width, const unsigned int height);
-    const Cell& operator()(const unsigned int width, const unsigned int height) const;
+    Cell& operator()(unsigned int width, unsigned int height);
+    const Cell& operator()(unsigned int width, unsigned int height) const;
 
-    Grid crop( int x0,  int y0,  int x1,  int y1);
+    Grid crop(int x0,  int y0,  int x1,  int y1);
     void merge(Grid other, int x0, int y0, bool alive_only = false);
 
     Grid rotate(int rotation);

@@ -22,6 +22,7 @@
  * @date March, 2020
  */
 #include "world.h"
+#include <utility>
 
 // Include the minimal number of headers needed to support your implementation.
 // #include ...
@@ -109,7 +110,7 @@ World::World(unsigned int width, unsigned int height){
  */
 
 World::World(Grid initial_grid){
-    currentGrid = initial_grid;
+    currentGrid = std::move(initial_grid);
     nextGrid = Grid(get_width(),get_height());
 }
 
@@ -137,7 +138,7 @@ World::World(Grid initial_grid){
  *      The width of the world.
  */
 
-int World::get_width() const {
+unsigned int World::get_width() const {
     return currentGrid.get_width();
 }
 
@@ -164,7 +165,7 @@ int World::get_width() const {
  * @return
  *      The height of the world.
  */
-int World::get_height() const {
+unsigned int World::get_height() const {
     return currentGrid.get_height();
 }
 
@@ -191,7 +192,7 @@ int World::get_height() const {
  * @return
  *      The number of total cells.
  */
-int World::get_total_cells() const {
+unsigned int World::get_total_cells() const {
     return currentGrid.get_total_cells();
 }
 
@@ -218,7 +219,7 @@ int World::get_total_cells() const {
  * @return
  *      The number of alive cells.
  */
-int World::get_alive_cells() const {
+unsigned int World::get_alive_cells() const {
     return currentGrid.get_alive_cells();
 }
 
@@ -245,7 +246,7 @@ int World::get_alive_cells() const {
  * @return
  *      The number of dead cells.
  */
-int World::get_dead_cells() const {
+unsigned int World::get_dead_cells() const {
     return currentGrid.get_dead_cells();
 }
 
@@ -360,14 +361,14 @@ void World::resize(const unsigned int &width, const unsigned int &height){
 
 int World::count_neighbours(const int x, const int y, bool toroidal){
     int count_neighbours = 0;
-    if(toroidal == false){
+    if(!toroidal){
         for(int j = y - 1; j <= y+1; j++){
             for(int i = x-1; i <= x+1; i++) {
                 if(i == x && j == y) {
                     continue;
                 }
                 if (i >= 0 && i < get_width() && j >= 0 && j < get_height()) {
-                    if (get_state().get(i,j) == Cell::ALIVE) {
+                    if (get_state().get(i,j) == ALIVE) {
                         count_neighbours += 1;
                     }
                 }
@@ -382,45 +383,45 @@ int World::count_neighbours(const int x, const int y, bool toroidal){
                     //Left side of the grid and corners
                 else if (i  < 0) {
                     if (j < 0) {
-                        if (get_state().get(get_width() - 1, get_height() - 1) == Cell::ALIVE) {
+                        if (get_state().get(get_width() - 1, get_height() - 1) == ALIVE) {
                             count_neighbours += 1;
                         }
                     } else if (j >= get_height()) {
-                        if (get_state().get(get_width() - 1, 0) == Cell::ALIVE) {
+                        if (get_state().get(get_width() - 1, 0) == ALIVE) {
                             count_neighbours += 1;
                         }
                     } else {
-                        if (get_state().get(get_width() - 1, j) == Cell::ALIVE) {
+                        if (get_state().get(get_width() - 1, j) == ALIVE) {
                             count_neighbours += 1;
                         }
                     }
                     //right side of grid and corners
                 } else if (i >= get_width()) {
                     if (j < 0) {
-                        if (get_state().get(0, get_height() - 1) == Cell::ALIVE) {
+                        if (get_state().get(0, get_height() - 1) == ALIVE) {
                             count_neighbours += 1;
                         }
                     } else if (j >= get_height()) {
-                        if (get_state().get(0, 0) == Cell::ALIVE) {
+                        if (get_state().get(0, 0) == ALIVE) {
                             count_neighbours += 1;
                         }
                     } else {
-                        if (get_state().get(0, j) == Cell::ALIVE) {
+                        if (get_state().get(0, j) == ALIVE) {
                             count_neighbours += 1;
                         }
                     }
                     //top side of grid
                 }else if (j < 0) {
-                    if (get_state().get(i, get_height() - 1) == Cell::ALIVE) {
+                    if (get_state().get(i, get_height() - 1) == ALIVE) {
                         count_neighbours += 1;
                     }
                     //bottom side of grid
                 }else if (j >= get_height()) {
-                    if (get_state().get(i, 0) == Cell::ALIVE) {
+                    if (get_state().get(i, 0) == ALIVE) {
                         count_neighbours += 1;
                     }
                 }else if (i >= 0 && i < get_width() && j >= 0 && j < get_height()) {
-                    if (get_state().get(i,j) == Cell::ALIVE) {
+                    if (get_state().get(i,j) == ALIVE) {
                         count_neighbours += 1;
                     }
                 }
@@ -454,17 +455,17 @@ void World::step(bool toroidal){
     for(int y = 0; y < get_height(); y++){
         for(int x = 0; x < get_width(); x++){
             int num = count_neighbours(x,y,toroidal);
-            if(get_state().get(x,y) == Cell::ALIVE){
+            if(get_state().get(x,y) == ALIVE){
                 if(num < 2 || num > 3){
-                    nextGrid.set(x,y,Cell::DEAD);
+                    nextGrid.set(x,y,DEAD);
                 }else{
-                    nextGrid.set(x,y,Cell::ALIVE);
+                    nextGrid.set(x,y,ALIVE);
                 }
             }else{
                 if(num == 3){
-                    nextGrid.set(x,y,Cell::ALIVE);
+                    nextGrid.set(x,y,ALIVE);
                 }else{
-                    nextGrid.set(x,y,Cell::DEAD);
+                    nextGrid.set(x,y,DEAD);
                 }
             }
         }
@@ -486,7 +487,7 @@ void World::step(bool toroidal){
  *      wraps to the right edge and the top to the bottom. Defaults to false.
  */
 
-void World::advance(const unsigned int steps, bool toroidal){
+void World::advance(unsigned int steps, bool toroidal){
     for(int i = 0; i < steps; i++){
         step(toroidal);
     }
