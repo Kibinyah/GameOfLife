@@ -39,8 +39,8 @@
  *
  */
 World::World(){
-    currentGrid = NULL;
-    nextGrid = NULL;
+    currentGrid = 0;
+    nextGrid = 0;
 }
 
 /**
@@ -362,65 +362,88 @@ void World::resize(const unsigned int &width, const unsigned int &height){
 int World::count_neighbours(const int x, const int y, bool toroidal){
     int count_neighbours = 0;
     if(!toroidal){
+        //for toroidal = false
+        //nested for loop for cells surrounding the current cell
         for(int j = y - 1; j <= y+1; j++){
             for(int i = x-1; i <= x+1; i++) {
-                if(i == x && j == y) {
+                //Skips the centre cell
+                if(i == x && j == y){
                     continue;
                 }
-                if (i >= 0 && i < get_width() && j >= 0 && j < get_height()) {
-                    if (get_state().get(i,j) == ALIVE) {
+                //Checks the surrounding cell of the current cell is not against the grid wall.
+                if(i >= 0 && (unsigned int)i < get_width() && j >= 0 && (unsigned int)j < get_height()){
+                    //Increments count_neighbours if the surrounding cell is alive.
+                    if(get_state().get(i,j) == ALIVE){
                         count_neighbours += 1;
                     }
                 }
             }
         }
     }else {
+        //For torodial = true
+        //Nested for loop for cells surrounding the current cell
         for(int j = y - 1; j <= y+1; j++){
             for(int i = x-1; i <= x+1; i++) {
+                //skips the centre cell
                 if(i == x && j == y) {
                     continue;
                 }
-                    //Left side of the grid and corners
+                //Checks if the left side of surround cells are beyond the left wall
                 else if (i  < 0) {
+                    //Checks if the top left surrounding cell is beyond the grid
                     if (j < 0) {
+                        //Increments the counter if the bottom right cell of the grid is alive
                         if (get_state().get(get_width() - 1, get_height() - 1) == ALIVE) {
                             count_neighbours += 1;
                         }
-                    } else if (j >= get_height()) {
+                    //Checks if the bottom left surrounding cell is beyond the grid.
+                    } else if ((unsigned int)j >= get_height()) {
+                        //Increments the counter if the top left cell of the grid is alive.
                         if (get_state().get(get_width() - 1, 0) == ALIVE) {
                             count_neighbours += 1;
                         }
+                    //Checks if j is within the range of the height
                     } else {
+                        //Increments the counter if the opposite right end of the current grid row is alive
                         if (get_state().get(get_width() - 1, j) == ALIVE) {
                             count_neighbours += 1;
                         }
                     }
-                    //right side of grid and corners
-                } else if (i >= get_width()) {
+                //Checks if the right side of surround cells are beyond the right wall
+                } else if ((unsigned int)i >= get_width()) {
+                    //Checks if the top right surrounding cell is beyond the grid
                     if (j < 0) {
+                        //Increments the counter if the bottom left cell of the grid is alive
                         if (get_state().get(0, get_height() - 1) == ALIVE) {
                             count_neighbours += 1;
                         }
-                    } else if (j >= get_height()) {
+                    //Checks if the bottom right surrounding cell is beyond the grid.
+                    } else if ((unsigned int)j >= get_height()) {
+                        //Increments the counter if the top left cell of the grid is alive
                         if (get_state().get(0, 0) == ALIVE) {
                             count_neighbours += 1;
                         }
+                    //Checks if j is within the range of the height
                     } else {
+                        //Increments the counter if the opposite left end of the current grid row is alive
                         if (get_state().get(0, j) == ALIVE) {
                             count_neighbours += 1;
                         }
                     }
-                    //top side of grid
+                //Checks if the top side of surround cells are beyond the top wall
                 }else if (j < 0) {
+                    //Increments the counter if the opposite bottom end of the current grid column is alive
                     if (get_state().get(i, get_height() - 1) == ALIVE) {
                         count_neighbours += 1;
                     }
-                    //bottom side of grid
-                }else if (j >= get_height()) {
+                //Checks if the bottom side of surround cells are beyond the bottom wall
+                }else if ((unsigned int)j >= get_height()) {
+                    //Increments the counter if the opposite top end of the current grid column is alive
                     if (get_state().get(i, 0) == ALIVE) {
                         count_neighbours += 1;
                     }
-                }else if (i >= 0 && i < get_width() && j >= 0 && j < get_height()) {
+                //Increments the counter if the surrounding cell is within the dimensions of the grid.
+                }else if (i >= 0 && (unsigned int)i < get_width() && j >= 0 && (unsigned int)j < get_height()) {
                     if (get_state().get(i,j) == ALIVE) {
                         count_neighbours += 1;
                     }
@@ -452,15 +475,20 @@ int World::count_neighbours(const int x, const int y, bool toroidal){
  */
 
 void World::step(bool toroidal){
-    for(int y = 0; y < get_height(); y++){
-        for(int x = 0; x < get_width(); x++){
-            int num = count_neighbours(x,y,toroidal);
+    for(unsigned int y = 0; y < get_height(); y++){
+        for(unsigned int x = 0; x < get_width(); x++){
+            //find the number of neighbours of the current cell
+            unsigned int num = count_neighbours(x,y,toroidal);
+            //If current cell is alive and has neighbours of less than 2 or more than 3, it becomes dead.
+            //If current cell is alive and has neighbours of 2 or 3, it stays alive.
             if(get_state().get(x,y) == ALIVE){
                 if(num < 2 || num > 3){
                     nextGrid.set(x,y,DEAD);
                 }else{
                     nextGrid.set(x,y,ALIVE);
                 }
+            //If current cell is dead and has neighbours of 3, it becomes alive.
+            //If current cell is dead and doesnt have neighbours of 3, it stays dead.
             }else{
                 if(num == 3){
                     nextGrid.set(x,y,ALIVE);
@@ -488,7 +516,7 @@ void World::step(bool toroidal){
  */
 
 void World::advance(unsigned int steps, bool toroidal){
-    for(int i = 0; i < steps; i++){
+    for(unsigned int i = 0; i < steps; i++){
         step(toroidal);
     }
 }

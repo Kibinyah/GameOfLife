@@ -13,7 +13,7 @@
  */
 #include "grid.h"
 #include <cstdlib>
-#import <stdexcept>
+#include <stdexcept>
 
 // Include the minimal number of headers needed to support your implementation.
 // #include ...
@@ -33,8 +33,7 @@
 Grid::Grid() {
     height = 0;
     width = 0;
-    //cellVector->empty();
-    //grid.empty();
+    grid.assign(0, Cell::DEAD);
 }
 
 /**
@@ -63,7 +62,6 @@ Grid::Grid() {
 Grid::Grid(unsigned int square_size) {
     width = square_size;
     height = square_size;
-    //this->grid = std::vector<Cell>();
     grid.assign(get_total_cells(), Cell::DEAD);
 }
 
@@ -88,7 +86,6 @@ Grid::Grid(unsigned int square_size) {
 Grid::Grid(const unsigned int w, const unsigned int h) {
     this->width = w;
     this->height = h;
-    //this->grid = std::vector<Cell>();
     grid.assign(get_total_cells(), Cell::DEAD);
 }
 
@@ -202,7 +199,7 @@ unsigned int Grid::get_total_cells() const {
  */
 unsigned int Grid::get_alive_cells() const {
     int count = 0;
-    for (int i = 0; i < get_total_cells(); i++) {
+    for (unsigned int i = 0; i < get_total_cells(); i++) {
         if (grid[i] == ALIVE) {
             count++;
         }
@@ -235,7 +232,7 @@ unsigned int Grid::get_alive_cells() const {
  */
 unsigned int Grid::get_dead_cells() const {
     int count = 0;
-    for (int i = 0; i < get_total_cells(); i++) {
+    for (unsigned int i = 0; i < get_total_cells(); i++) {
         if (grid[i] == DEAD) {
             count++;
         }
@@ -263,26 +260,30 @@ unsigned int Grid::get_dead_cells() const {
  */
 
 void Grid::resize(const unsigned int &square_size) {
-    int newWidth = std::min(square_size, width);
-    int newHeight = std::min(square_size, height);
+    //Finds the minimum between the square size and length for width and height
+    unsigned int minWidth = std::min(square_size, width);
+    unsigned int minHeight = std::min(square_size, height);
 
+    //Created a new vector that contains the values of the original vector
     std::vector<Cell> oldGrid(grid);
+    //Converts the original vector with the new sizes and fills it all with dead cells.
+    grid.assign(square_size * square_size, Cell::DEAD);
 
-    grid.resize(square_size * square_size);
-    for (int y = 0; y < newWidth; y++) {
-        for (int x = 0; x < newHeight; x++) {
+    for (unsigned int y = 0; y < minWidth; y++) {
+        for (unsigned int x = 0; x < minHeight; x++) {
             unsigned int coordinate = (square_size * y) + x;
-            if (oldGrid.at((width * y) + x)) {
-                grid.at(coordinate) = oldGrid.at((width * y) + x);
+            //if the a Cell exists in the old grid, store cell in the new grid of the same position
+            //else, store the cell as DEAD in new grid.
+            if (oldGrid[(width * y) + x]) {
+                grid[coordinate] = oldGrid[(width * y) + x];
             } else {
-                grid.at(coordinate) = DEAD;
-
+                grid[coordinate] = DEAD;
             }
         }
     }
-
-    width = square_size;
-    height = square_size;
+    //Assign the width and height to the square size
+    this->width = square_size;
+    this->height = square_size;
 }
 
 /**
@@ -306,27 +307,29 @@ void Grid::resize(const unsigned int &square_size) {
  *      The new height for the grid.
  */
 void Grid::resize(const unsigned int &w, const unsigned int &h) {
-    int newWidth = std::min(w, width);
-    int newHeight = std::min(h, height);
+    //Finds the minimum between the new width and new height with the current width and height
+    unsigned int minWidth = std::min(w, width);
+    unsigned int minHeight = std::min(h, height);
 
+    //Created a new vector that contains the values of the original vector
     std::vector<Cell> oldGrid(grid);
-
+    //Converts the original vector with the new width and height and fills it all with dead cells.
     grid.assign(w * h, Cell::DEAD);
-
-    for (int y = 0; y < newHeight; y++) {
-        for (int x = 0; x < newWidth; x++) {
-            //if (oldGrid[(width * y) + x]) {
+    //nested for loop up to the mininum height and mininum width
+    for (unsigned int y = 0; y < minHeight; y++) {
+        for (unsigned int x = 0; x < minWidth; x++) {
+            //if the a Cell exists in the old grid, store cell in the new grid of the same position
+            //else, store the cell as DEAD in new grid.
             if (oldGrid[(width * y) + x]) {
                 grid[(w * y) + x] = oldGrid[(width * y) + x];
-                //grid.at((w*y)+x) = oldGrid.at((width*y)+x);
             } else {
-                grid.at((w * y) + x) = DEAD;
+                grid[(w * y) + x] = DEAD;
             }
         }
     }
-
-    width = w;
-    height = h;
+    //Assign current width and height to new width and height.
+    this->width = w;
+    this->height = h;
 }
 
 /**
@@ -380,12 +383,10 @@ unsigned int Grid::get_index(unsigned int x, unsigned int y) const {
  */
 
 Cell Grid::get(unsigned int x, unsigned int y) const {
-    // if(!grid[get_index(x,y)]){
-    if (x < 0 || x >= this->width || y < 0 || y >= this->height) {
+    if (x >= width ||  y >= height) {
         throw (std::exception());
     } else {
-        // Cell cell = grid[get_index(x,y)];
-        return grid.at(get_index(x, y));
+        return grid[get_index(x, y)];
     }
 }
 
@@ -416,12 +417,10 @@ Cell Grid::get(unsigned int x, unsigned int y) const {
  *      std::exception or sub-class if x,y is not a valid coordinate within the grid.
  */
 void Grid::set(const unsigned int &x, const unsigned int &y, const Cell &value) {
-    //if(!grid[get_index(x,y)]){
-    if (x < 0 || x >= this->width || y < 0 || y >= this->height) {
+    if (x >= width || y >= height) {
         throw (std::exception());
     } else {
-        // grid[get_index(x,y)] = value;
-        grid.at(get_index(x, y)) = value;
+        grid[get_index(x, y)] = value;
     }
 }
 
@@ -461,11 +460,11 @@ void Grid::set(const unsigned int &x, const unsigned int &y, const Cell &value) 
  *      std::runtime_error or sub-class if x,y is not a valid coordinate within the grid.
  */
 
-Cell &Grid::operator()( unsigned int x,  unsigned int y) {
-    if (x < 0 || x >= this->width || y < 0 || y >= this->height) {
+Cell &Grid::operator()(unsigned int x, unsigned int y) {
+    if (x >= width || y >= height) {
         throw std::runtime_error("Not a valid coordinate");
     } else {
-        return grid.at(get_index(x, y));
+        return grid[get_index(x, y)];
     }
 }
 
@@ -501,7 +500,7 @@ Cell &Grid::operator()( unsigned int x,  unsigned int y) {
  */
 
 const Cell &Grid::operator()(unsigned int x, unsigned int y) const {
-    if (x < 0 || x >= this->width || y < 0 || y >= this->height) {
+    if (x >= width || y >= height) {
         throw std::runtime_error("Not a valid coordinate");
     } else {
         return grid[get_index(x, y)];
@@ -542,30 +541,33 @@ const Cell &Grid::operator()(unsigned int x, unsigned int y) const {
  *      std::exception or sub-class if x0,y0 or x1,y1 are not valid coordinates within the grid
  *      or if the crop window has a negative size.
  */
-Grid Grid::crop(int x0, int y0, int x1, int y1) {
+Grid Grid::crop(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1) const{
+    //Throws exception when either variables arnt a valid coordinate or if x1,y1 are smaller than x0,y0
     if (x0 < 0 || x1 < 0 || x0 > width || x1 > width || y0 < 0 || y1 < 0 || y0 > height ||
         y1 > height || x0 > x1 || y0 > y1) {
         throw (std::exception());
     }
-    int newWidth = x1 - x0;
-    int newHeight = y1 - y0;
-    int newX = 0;
-    int newY = 0;
+    //Calculates the new width and height for the grid
+    unsigned int newWidth = x1 - x0;
+    unsigned int newHeight = y1 - y0;
+    //Create a new grid with the new width and height
     Grid g(newWidth, newHeight);
-    for (int y = y0; y < y1; y++) {
-        for (int x = x0; x < x1; x++) {
+    //Values to be incremented during nested for loop to find coordinate of new grid.
+    unsigned int newX = 0;
+    unsigned int newY = 0;
+    //Nested for loop for cells between x0,y0 to x1,y1
+    for (unsigned int y = y0; y < y1; y++) {
+        for (unsigned int x = x0; x < x1; x++) {
+            //Sets the cell from cropped grid to new grid.
             g.grid[newX + (newWidth * newY)] = grid[x + (width * y)];
+            //Increment newX but if it is 1 below the newWidth, set to 0 for new row.
             if (newX == newWidth - 1) {
                 newX = 0;
             } else {
                 newX++;
             }
         }
-        if (newY == newHeight - 1) {
-            newY = 0;
-        } else {
-            newY++;
-        }
+        newY++;
     }
     return g;
 }
@@ -608,21 +610,26 @@ Grid Grid::crop(int x0, int y0, int x1, int y1) {
  *      std::exception or sub-class if the other grid being placed does not fit within the bounds of the current grid.
  */
 
-void Grid::merge(Grid other, int x0, int y0, bool alive_only) {
-    if ((other.width * other.height) > width * height || x0 < 0 || y0 < 0) {
+void Grid::merge(const Grid &other, int x0,  int y0, bool alive_only) {
+    //Throws exception if the other grid has larger dimensions than current grid or if x0,y0 does not fit in current dimensions.
+    if ((other.width * other.height) > width * height || x0 < 0 || y0 < 0 || (unsigned int)x0 > width || (unsigned int)y0 > height) {
         throw (std::exception());
     } else {
-        for (int j = y0; j < y0 + other.height; j++) {
-            for (int i = x0; i < x0 + other.width; i++) {
+        //Turns ints to unsigned ints to avoid warnings
+        unsigned int mergeX = x0;
+        unsigned int mergeY = y0;
+        //Nested for loop to the size of other grid from the merge points.
+        for (unsigned int y = mergeY; y < (mergeY + other.height); y++) {
+            for (unsigned int x = mergeX; x < (mergeX + other.width); x++) {
+                unsigned int position = ((y - mergeY) * (other.width)) + (x - mergeX);
+                //if alive_only is false, set the current position to the calculated position of the other grid.
                 if (!alive_only) {
-                    set(i, j, other.grid.at(((j - y0) * (other.width)) + (i - x0)));
+                    set(x, y, other.grid[position]);
                 } else {
-                    if (other.grid.at(((j - y0) * (other.width)) + (i - x0)) == Cell::ALIVE) {
-                        grid.at((j * (width)) + i) = other.grid.at(((j - y0) * (other.width)) + (i - x0));
+                    //if alive_only is true and other grid Cell is ALIVE, set the current cell to ALIVE
+                    if (other.grid[position] == Cell::ALIVE) {
+                        set(x, y, other.grid[position]);
                     }
-                    /*if(other.grid[((j-y0) * (other.width)) + (i-x0)] == Cell::DEAD){
-                    //    grid[(j*(width))+1] = other.grid[((j-y0)*(other.width)) + (i-x0) ];
-                    }*/
                 }
             }
         }
@@ -653,52 +660,57 @@ void Grid::merge(Grid other, int x0, int y0, bool alive_only) {
  **/
 
 Grid Grid::rotate(int rotation) {
-    // 1, -3 = 90
-    // 2, -2 = 180
-    // -1, 3 = 270
+    unsigned int offset = 0;
+    //Assigns the rotation value to be either 0,1,2 or 3 using math algorithm
+    //0 is for 0 degrees
+    //1 is for 90 degrees
+    //2 is for 180 degrees
+    //3 is for 270 degrees
     rotation = std::abs(rotation % 4 + 4) % 4;
+
     if (rotation == 1) {
-        //Grid *temp = new Grid(width,height);
+        //New grid with swapped width and height is made to set values to from old grid
         Grid g = Grid(height, width);
-        if (width >= height) {
-            for (int y = 0; y < width; y++) {
-                for (int x = 0; x < height; x++) {
-                    unsigned int offset = (height * height - 1) - (x * (width)) + y;
-                    g.set(x, y, grid.at(offset));
+        for (unsigned int y = 0; y < width; y++) {
+            for (unsigned int x = 0; x < height; x++){
+                //For 90 degrees, a slightly different algorithm is used depending on the size of width and height
+                //All algorithms have the same premise of traversing the old grid from bottom left upwards and rightwards to top right.
+                if(width > height) {
+                    offset = (height * height - 1) - (x * (width)) + y;
+                }else if(width == height){
+                    offset = (width * (width - 1)) - (x * (width)) + y;
+                }else{
+                    offset = (width * width) - (x * (width)) + y;
                 }
-            }
-        } else {
-            for (int y = 0; y < width; y++) {
-                for (int x = 0; x < height; x++) {
-                    unsigned int offset = (width * width) - (x * (width)) + y;
-                    g.set(x, y, grid.at(offset));
-                }
+                g.set(x, y, grid[offset]);
             }
         }
-
         return g;
 
-    } else if (rotation == 2) {
+    }else if (rotation == 2) {
         Grid g = Grid(width, height);
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
+        for (unsigned int y = 0; y < height; y++) {
+            for (unsigned int x = 0; x < width; x++) {
+                //For 180 degrees, algorithm will traverse the old grid backwards from bottom right to top left
                 unsigned int offset = (height * width - 1) - get_index(x, y);
-                g.set(x, y, grid.at(offset));
+                g.set(x, y, grid[offset]);
             }
         }
         return g;
 
     } else if (rotation == 3) {
-        //Grid *temp = new Grid(width,height);
         Grid g = Grid(height, width);
-        for (int y = 0; y < width; y++) {
-            for (int x = 0; x < height; x++) {
-                unsigned int offset = (width - 1 - y) + (x * (width));
-                g.set(x, y, grid.at(offset));
+            for (unsigned int y = 0; y < width; y++) {
+                for (unsigned int x = 0; x < height; x++) {
+                    //For 270 degrees, algorithm traverses the old grid from top right downwards and leftward to bottom left.
+                    unsigned int offset = (width - 1 - y) + (x * (width));
+                    g.set(x, y, grid[offset]);
+                }
             }
-        }
+
         return g;
     }
+    //Returns the current grid when the rotation is 0.
     return *this;
 }
 
@@ -741,15 +753,17 @@ Grid Grid::rotate(int rotation) {
 
 
 std::ostream &operator<<(std::ostream &out, const Grid &g) {
+    //Print out the first row symbols
     out << "+";
-    for (int i = 0; i < g.get_width(); i++) {
+    for (unsigned int i = 0; i < g.get_width(); i++) {
         out << "-";
     }
     out << "+" << std::endl;
 
-    for (int j = 0; j < g.get_height(); j++) {
+    //Print out the cells with boundary lines.
+    for (unsigned int j = 0; j < g.get_height(); j++) {
         out << "|";
-        for (int i = 0; i < g.get_width(); i++) {
+        for (unsigned int i = 0; i < g.get_width(); i++) {
             if (g.get(i, j) == Cell::ALIVE) {
                 out << "#";
             } else {
@@ -759,8 +773,9 @@ std::ostream &operator<<(std::ostream &out, const Grid &g) {
         out << "|" << std::endl;
     }
 
+    //Print out the bottom row symbols
     out << "+";
-    for (int i = 0; i < g.get_width(); i++) {
+    for (unsigned int i = 0; i < g.get_width(); i++) {
         out << "-";
     }
     out << "+" << std::endl;

@@ -25,7 +25,6 @@
 #include <fstream>
 #include <sstream>
 #include <array>
-#import <stdexcept>
 #include <bitset>
 
 // Include the minimal number of headers needed to support your implementation.
@@ -155,40 +154,50 @@ Grid Zoo::load_ascii(const std::string& path){
     std::ifstream file(path);
     int width = 0;
     int height = 0;
-    //int x = 0;
-    int y = 0;
-    Grid g;
 
-    if (!file.is_open()) {
+    //Throws runtime error if file cannot be opened
+    if(!file.is_open()){
         throw std::runtime_error("No file found");
     }
-        file >> width >> height;
-
-        if (width < 0 || height < 0) {
-            throw (std::runtime_error("Width and height need to be positive"));
+    //Reads the 1st and 2nd elements of the file as width and height.
+    file >> width >> height;
+    //Throws runtime error if the width or height is less than 0
+    if(width < 0 || height < 0){
+        throw (std::runtime_error("Width and height need to be positive"));
+    }
+    //Turn width and height to unsigned ints to remove warnings.
+    unsigned int unsignedWidth = width;
+    unsigned int unsignedHeight = height;
+    Grid g(unsignedWidth, unsignedHeight);
+    unsigned int y = 0;
+    //Reads each line of the file.
+    while(getline(file, line) && y < unsignedHeight){
+        unsigned int lineSize = line.size();
+        //Throws runtime error if it expects characters in the new line
+        if (lineSize != unsignedWidth && y > 0){
+            throw std::runtime_error("No characters in new line");
         }
-        g = Grid(width, height);
-        while (getline(file, line) && y < height) {
-            if (line.size() != width && y > 0) {
-                throw std::runtime_error("No characters in new line");
-            }
-            for (int x = 0; x < line.size(); x++) {
-                char c = line.at(x);
-                if (c == '#') {
-                    g.set(x, y, Cell::ALIVE);
-                } else if (c == ' ') {
-                    g.set(x, y, Cell::DEAD);
-                } else {
-                    throw std::runtime_error("Wrong character");
-                }
-            }
-            // }
-            if (line.size() == width) {
-                y++;
+        //Reads each character of the line
+        for(unsigned int x = 0; x < lineSize; x++){
+            char c = line.at(x);
+            //Sets cell to be alive if it reads '#'
+            if (c == '#') {
+                g.set(x, y, Cell::ALIVE);
+            //Sets cell to be dead if it reads ' '
+            } else if (c == ' ') {
+                g.set(x, y, Cell::DEAD);
+            //throws runtime error if neither characters are read.
+            } else {
+                throw std::runtime_error("Wrong character");
             }
         }
-        file.close();
-        return g;
+        //increments y if the line size is the same as width.
+        if (lineSize == unsignedWidth) {
+            y++;
+        }
+    }
+    file.close();
+    return g;
 }
 
 /**
@@ -222,23 +231,27 @@ Grid Zoo::load_ascii(const std::string& path){
 void Zoo::save_ascii(const std::string& path, const Grid& g){
     std::ofstream file;
     file.open(path,std::ios::out);
+    //throws runtime error if file cannot be opened
     if(!file.is_open()){
         throw std::runtime_error("Unable to open file");
     }
+    //Initially writes the width and height into file
     file << g.get_width() << " " << g.get_height() << "\n";
+    //Stringstream recieves the characters that represent the grid and is converted to string value.
     std::stringstream ss;
     ss << g;
     std::string s = ss.str();
-    bool temp = true;
-    for(int i = 0; i < s.size() - g.get_width() - 3; i++) {
+    //for loop that traverse through the grid excluding the top symbol row and the bottom symbol row
+    for(unsigned int i = g.get_width() + 3; i < s.size() - g.get_width() - 3; i++) {
+        //If string value has ' ', write ' ' to file.
         if (s.at(i) == ' ') {
             file << ' ';
+        //If string value has '#', write '#' to file.
         } else if (s.at(i) == '#') {
             file << '#';
-        } else if (s.at(i) == '\n' && !temp) {
+        //If string value has '\n', writhe '\n' to file.
+        } else if (s.at(i) == '\n') {
             file << '\n';
-        } else if (s.at(i) == '\n' && temp) {
-            temp = false;
         }
     }
     file.close();
@@ -270,51 +283,55 @@ Grid Zoo::load_binary(const std::string& path) {
     std::ifstream file(path, std::ios::binary);
     unsigned int width = 0;
     unsigned int height = 0;
-    //Grid g(width,height);
+    //throws runtime error when the file cannot be opened.
     if (!file.is_open()) {
         throw std::runtime_error("No file found");
     }
 
-        file.seekg(0, std::ios::end);
-        unsigned int size = file.tellg();
-        file.seekg(0, std::ios::beg);
-
-        file.read((char *) &width, sizeof(int));
-        //file.seekg(4);
-        file.read((char *) &height, sizeof(int));
-
-        //file.seekg(8);
-
-        std::bitset<500> bitset(width * height);
-        for (int i = 0; i < width * height; i++) {
-            bitset[i] = 0;
-        }
-
-        int temp = 0;
-        for (int j = 8; j < size; j++) {
-            unsigned int byte;
-            file.read((char *) &byte, 1);
-            for (unsigned int i = 0; i < 8; i++) {
-                unsigned int bit = (byte >> i) & 0x1;
-                unsigned int index = i + temp;
-                if (bit == 1) {
-                    bitset[index] = 1;
-                }
+    //Sets binary reader pointer to the end of the file to set the file size.
+    file.seekg(0, std::ios::end);
+    unsigned int size = file.tellg();
+    //Sets the binary reader pointer back to the beginning of the file.
+    file.seekg(0, std::ios::beg);
+    //Reads in the first 4 byte to find the width
+    file.read((char *) &width, sizeof(int));
+    //Reads the next 4 bytes to find the height
+    file.read((char *) &height, sizeof(int));
+    //Create a bitset with width and height and assign all values to false.
+    std::bitset<500> bitset(width * height);
+    for (unsigned int i = 0; i < width * height; i++) {
+        bitset[i] = false;
+    }
+    unsigned int temp = 0;
+    for (unsigned int j = 8; j < size; j++) {
+        //Reads a byte from the file
+        unsigned int byte;
+        file.read((char *) &byte, 1);
+        //For loop to read each bit of the byte
+        for (unsigned int i = 0; i < 8; i++) {
+            //Calculates if the bit is either 1 or 0
+            unsigned int bit = (byte >> i) & 0x1u;
+            unsigned int index = i + temp;
+            //if bit is 1, then assign the current index of the bitset to true.
+            if (bit == 1) {
+                bitset[index] = true;
             }
-            temp += 8;
         }
-
-        if(temp < width*height){
-            file.close();
-            throw std::runtime_error("File ended unexpectedly");
-        }
-        Grid g(width, height);
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                unsigned int point = (width * y) + x;
-                if (bitset[point] == 1) {
-                    g.set(x, y, Cell::ALIVE);
-                }
+        temp += 8;
+    }
+    //throws runtime error when the temp counter is smaller than the grid size.
+    if(temp < width*height){
+        file.close();
+        throw std::runtime_error("File ended unexpectedly");
+    }
+    Grid g(width, height);
+    //Nested for loop to set cell values to from bitset
+    for (unsigned int y = 0; y < height; y++) {
+        for (unsigned int x = 0; x < width; x++) {
+            unsigned int point = (width * y) + x;
+            //If bitset value is true, set the current cell to be alive
+            if (bitset[point] == true) {
+                g.set(x, y, Cell::ALIVE);}
             }
         }
     file.close();
@@ -355,32 +372,38 @@ Grid Zoo::load_binary(const std::string& path) {
 void Zoo::save_binary(const std::string& path, const Grid& g){
     std::ofstream file;
     file.open(path, std::ios::out | std::ios::binary);
+    //Throws runtime error if the file is unable to open.
     if (!file.is_open()) {
         throw std::runtime_error("Unable to open file");
     }
-    int width = g.get_width();
-    int height = g.get_height();
+
+    //Writes into the file the width and height with 4 bytes each
+    unsigned int width = g.get_width();
+    unsigned int height = g.get_height();
     file.write((char *) &width, sizeof(int));
     file.write((char *) &height, sizeof(int));
-
+    //Create a bitset with width and height and assign all values to false.
     std::bitset<500> bitset(width * height);
-    for (int i = 0; i < width * height; i++) {
-        bitset[i] = 0;
+    for (unsigned int i = 0; i < width * height; i++) {
+        bitset[i] = false;
     }
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
+    //Nested for loop through the grid
+    for (unsigned int y = 0; y < height; y++) {
+        for (unsigned int x = 0; x < width; x++) {
+            //If the cell is alive, set the bitset to be true
             if (g.get(x, y) == Cell::ALIVE) {
-                bitset[g.get_index(x, y)] = 1;
+                bitset[g.get_index(x, y)] = true;
             }
         }
     }
-
     unsigned int byte = 0;
-    //int temp = 0;
-    int i = 0;
+    unsigned int i = 0;
+    //Loop through bitset
     while(i < width*height){
+        //Calculate a single byte by adding the next 8 bits together
         byte = (bitset[i]*1) + (bitset[i+1]*2) + (bitset[i+2]*4) + (bitset[i+3]*8) + (bitset[i+4]*16) +
                (bitset[i+5]*32) + (bitset[i+6]*64) + (bitset[i+7]*128);
+        //Write the byte to the file.
         file.write((char*)&byte,1);
         i += 8;
     }

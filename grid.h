@@ -56,8 +56,8 @@ public:
     Cell& operator()(unsigned int width, unsigned int height);
     const Cell& operator()(unsigned int width, unsigned int height) const;
 
-    Grid crop(int x0,  int y0,  int x1,  int y1);
-    void merge(Grid other, int x0, int y0, bool alive_only = false);
+    Grid crop(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1) const;
+    void merge(const Grid &other, int x0, int y0, bool alive_only = false);
 
     Grid rotate(int rotation);
     friend std::ostream& operator<<(std::ostream& out, const Grid& g);
