@@ -302,7 +302,7 @@ Grid Zoo::load_binary(const std::string& path) {
     for (unsigned int i = 0; i < width * height; i++) {
         bitset[i] = false;
     }
-    unsigned int temp = 0;
+    unsigned int index = 0;
     for (unsigned int j = 8; j < size; j++) {
         //Reads a byte from the file
         unsigned int byte;
@@ -311,16 +311,15 @@ Grid Zoo::load_binary(const std::string& path) {
         for (unsigned int i = 0; i < 8; i++) {
             //Calculates if the bit is either 1 or 0
             unsigned int bit = (byte >> i) & 0x1u;
-            unsigned int index = i + temp;
             //if bit is 1, then assign the current index of the bitset to true.
             if (bit == 1) {
                 bitset[index] = true;
             }
+            index++;
         }
-        temp += 8;
     }
     //throws runtime error when the temp counter is smaller than the grid size.
-    if(temp < width*height){
+    if(index < width*height){
         file.close();
         throw std::runtime_error("File ended unexpectedly");
     }
