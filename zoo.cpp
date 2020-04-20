@@ -294,9 +294,9 @@ Grid Zoo::load_binary(const std::string& path) {
     //Sets the binary reader pointer back to the beginning of the file.
     file.seekg(0, std::ios::beg);
     //Reads in the first 4 byte to find the width
-    file.read((char *) &width, sizeof(int));
+    file.read((char *) &width, sizeof(unsigned int));
     //Reads the next 4 bytes to find the height
-    file.read((char *) &height, sizeof(int));
+    file.read((char *) &height, sizeof(unsigned int));
     //Create a bitset with width and height and assign all values to false.
     std::bitset<500> bitset(width * height);
     for (unsigned int i = 0; i < width * height; i++) {
@@ -379,8 +379,8 @@ void Zoo::save_binary(const std::string& path, const Grid& g){
     //Writes into the file the width and height with 4 bytes each
     unsigned int width = g.get_width();
     unsigned int height = g.get_height();
-    file.write((char *) &width, sizeof(int));
-    file.write((char *) &height, sizeof(int));
+    file.write((char *) &width, sizeof(unsigned int));
+    file.write((char *) &height, sizeof(unsigned int));
     //Create a bitset with width and height and assign all values to false.
     std::bitset<500> bitset(width * height);
     for (unsigned int i = 0; i < width * height; i++) {
